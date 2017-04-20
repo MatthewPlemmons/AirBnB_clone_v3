@@ -87,14 +87,11 @@ class DBStorage:
 
     def get(self, cls, id):
         """Retrieve an object"""
-        #obj = self.__session.query(
-        #    self.__models_available[cls]).filter_by(id = id)
         return self.__session.query(self.__models_available[cls]).filter_by(
             id = id).one_or_none()
 
     def count(self, cls=None):
         """Number of objects in storage"""
-        #import pdb; pdb.set_trace()
         if cls:
             return self.__session.query(self.__models_available[cls]).count()
         else:
