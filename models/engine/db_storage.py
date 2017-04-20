@@ -76,10 +76,27 @@ class DBStorage:
         be in the init method
         """
         Base.metadata.create_all(self.__engine)
-        self.__session = scoped_session(sessionmaker(bind=self.__engine))
+        self.__session = scoped_session(sessionmaker(bind=self.__engine,
+                                                     expire_on_commit=False))
 
     def close(self):
         """
         close a session
         """
         self.__session.remove()
+
+    def get(self, cls, id):
+        """Retrieve an object"""
+        #obj = self.__session.query(
+        #    self.__models_available[cls]).filter_by(id = id)
+        return self.__session.query(self.__models_available[cls]).filter_by(
+            id = id).one_or_none()
+
+    def count(self, cls=None):
+        """Number of objects in storage"""
+        #import pdb; pdb.set_trace()
+        if cls:
+            return self.__session.query(self.__models_available[cls]).count()
+        else:
+            all_objs = self.all()
+            return len(all_objs)
