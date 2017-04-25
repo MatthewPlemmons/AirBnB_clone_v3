@@ -126,12 +126,12 @@ class HBNBCommand(cmd.Cmd):
         if args[0] not in HBNBCommand.valid_classes:
             print("** class doesn't exist **")
             return
-        all_objs = storage.all()
-        for objs_id in all_objs.keys():
-            if objs_id == args[1] and args[0] in str(type(all_objs[objs_id])):
-                print(all_objs[objs_id])
-                return
-        print("** no instance found **")
+        obj = storage.get(args[0], args[1])
+        if obj:
+            print(obj)
+        else:
+            print("** no instance found **")
+        return
 
     def do_destroy(self, args):
         """
