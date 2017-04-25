@@ -8,10 +8,11 @@ from models import storage
 def status():
     return jsonify({"status": "OK"})
 
+
 @app_views.route('/stats')
 def stats():
     """Number of objects for each model"""
     stats = {}
     for k, v in storage._DBStorage__models_available.items():
-       stats[v.__tablename__] = storage.count(k)
+        stats[v.__tablename__] = storage.count(k)
     return jsonify(stats)
