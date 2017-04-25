@@ -87,11 +87,14 @@ class DBStorage:
 
     def get(self, cls, id):
         """Retrieve an object"""
-        return self.__session.query(self.__models_available[cls]).filter_by(
-            id=id).one_or_none()
+        if isinstance(id, str) and cls in self.__models_available:
+            return self.__session.query(self.__models_available[cls]).filter_by(
+                id=id).one_or_none()
+        else:
+            return None
 
     def count(self, cls=None):
-        """Number of objects in storage"""
+        """Get number of objects in storage"""
         try:
             return self.__session.query(self.__models_available[cls]).count()
         except:
