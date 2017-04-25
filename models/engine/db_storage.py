@@ -88,8 +88,8 @@ class DBStorage:
     def get(self, cls, id):
         """Retrieve an object"""
         if isinstance(id, str) and cls in self.__models_available:
-            return self.__session.query(self.__models_available[cls]).filter_by(
-                id=id).one_or_none()
+            return self.__session.query(
+                self.__models_available[cls]).filter_by(id=id).one_or_none()
         else:
             return None
 
