@@ -64,6 +64,15 @@ class Test_FileStorage(unittest.TestCase):
         """test State creation with an argument"""
         pass
 
+    def test_get(self):
+        a = storage.get("Amenity", "")
+        self.assertIsNone(a)
+
+    def test_count(self):
+        a = storage.count("Amenity")
+        b = len(storage.all("Amenity"))
+        self.assertEqual(a, b)
+
 if __name__ == "__main__":
     import sys
     import os
