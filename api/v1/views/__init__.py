@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Import all API modules"""
 from flask import Blueprint
 from models import storage
 from models.state import State
