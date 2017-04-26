@@ -60,7 +60,7 @@ def update_city(city_id):
     try:
         city = storage.get("City", city_id)
     except:
-        return not_found(404)
+        abort(404)
     if request.is_json is False:
         abort(400, {"Not a JSON"})
 
@@ -69,9 +69,3 @@ def update_city(city_id):
     city.update({k: v for (k, v) in r.items() if k not in keys})
     city.save()
     return jsonify(city), 200
-
-
-@app.errorhandler(404)
-def not_found(error):
-    """Handle HTTP error code 404."""
-    return jsonify(error="Not found"), 404
