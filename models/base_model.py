@@ -85,12 +85,13 @@ class BaseModel:
     def to_json(self):
         """convert to json"""
         dupe = self.__dict__.copy()
-        dupe.pop('_sa_instance_state', None)
-
+        del dupe['_sa_instance_state']
         dupe["created_at"] = dupe["created_at"].isoformat()
+
         # sqlAlchemy_storage_engine
         if ("updated_at" in dupe):
             dupe["updated_at"] = dupe["updated_at"].isoformat()
+
         dupe["__class__"] = type(self).__name__
         return dupe
 
