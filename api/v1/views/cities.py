@@ -45,26 +45,33 @@ def add_city(state_id):
     """Add a new City object to a State."""
     try:
         r = request.get_json()
-    if not request.is_json:
-        abort(400, {"error": "Not a JSON"})
+    except:
+        return jsonify("Not a JSON"), 400
     if 'name' not in r.keys():
-        abort(400, {"error": "Missing name"})
-    state = State(name=r['name'])
-    state.save()
-    return jsonify(state.to_json()), 201
+        abort(400, {"Missing name"})
+    city = City(name=r['name'])
+    city.save()
+    return jsonify(city.to_json()), 201
 
 
 @app_views.route('/cities/<city_id>', methods=['PUT'])
 def update_city(city_id):
     """Update a City object."""
-    s = storage.get("State", state_id)
-    if not s:
-        abort(404)
-    r = request.get_json()
-    if not request.is_json:
-        abort(400, "Not a JSON")
-    s = s.to_json()
-    keys = ['id', 'created_at', 'updated_at']
-    s.update({k: v for (k, v) in r.items() if k not in keys})
-    storage.save()
-    return jsonify(s), 200
+    try:
+        city = storage.get("City", city_id)
+    except:
+        return not_found(404)
+    if request.is_json is False:
+        abort(400, {"Not a JSON"})
+
+    city = city.to_json()
+    keys = ['id', 'state_id', 'created_at', 'updated_at']
+    city.update({k: v for (k, v) in r.items() if k not in keys})
+    city.save()
+    return jsonify(city), 200
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle HTTP error code 404."""
+    return jsonify(error="Not found"), 404
