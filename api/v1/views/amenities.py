@@ -5,7 +5,7 @@ from flask import abort, request, jsonify
 from models.amenity import Amenity
 
 
-@app_views.route('/amenities/', methods=['GET'])
+@app_views.route('/amenities/', strict_slashes=False, methods=['GET'])
 def all_amenities():
     """
     Return a JSON list of all Amenity objects.
@@ -23,34 +23,34 @@ def get_amenity(amenity_id):
     """Return an Amenity object given it's ID."""
     try:
         amenity = storage.get("Amenity", amenity_id)
+        return jsonify(amenity.to_json())
     except:
         abort(404)
-    return jsonify(amenity.to_json())
 
 
 @app_views.route('/amenities/<amenity_id>', methods=['DELETE'])
 def delete_amenity(amenity_id):
     """Delete an Amenity object by it's ID."""
-    try:
-        amenity = storage.get("Amenity", amenity_id)
-        storage.delete(amenity)
-        storage.save()
-    except:
+    amenity = storage.get("Amenity", amenity_id)
+    if amenity is None:
         abort(404)
+    storage.delete(amenity)
+    storage.save()
     return jsonify({}), 200
 
 
-@app_views.route('/amenities', methods=['POST'])
+@app_views.route('/amenities', strict_slashes=False, methods=['POST'])
 def add_amenity():
     """Add a new Amenity object."""
     try:
         r = request.get_json()
+        amenity = Amenity(name=r['name'])
+        amenity.save()
+    except KeyError:
+        return jsonify(error="Missing name"), 400
     except:
-        return jsonify("Not a JSON"), 400
-    if 'name' not in r.keys():
-        abort(400, {"Missing name"})
-    amenity = Amenity(name=r['name'])
-    amenity.save()
+        return jsonify(error="Not a JSON"), 400
+
     return jsonify(amenity.to_json()), 201
 
 
@@ -58,14 +58,15 @@ def add_amenity():
 def update_amenity(amenity_id):
     """Update an Amenity object."""
     try:
-        amenity = storage.get("Amenity", amenity_id)
+        amenity = storage.get("Amenity", amenity_id).to_json()
     except:
         abort(404)
-    if request.is_json is False:
-        abort(400, {"Not a JSON"})
-    r = request.get_json()
-    amenity = amenity.to_json()
-    keys = ['id', 'created_at', 'updated_at']
-    amenity.update({k: v for (k, v) in r.items() if k not in keys})
-    storage.save()
+
+    try:
+        r = request.get_json().items()
+    except:
+        return jsonify(error="Not a JSON"), 400
+
+    amenity.update({k: v for (k, v) in r if k not in
+                    ['id', 'created_at', 'updated_at']})
     return jsonify(amenity), 200
