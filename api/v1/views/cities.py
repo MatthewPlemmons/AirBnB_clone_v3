@@ -2,7 +2,7 @@
 """API functionality for City objects."""
 from api.v1.views import app_views, storage
 from flask import abort, request, jsonify
-from models.state import State
+from models.city import City
 
 
 @app_views.route('/states/<state_id>/cities', methods=['GET'])
@@ -12,20 +12,19 @@ def all_cities(state_id):
     """
     try:
         state = storage.get('State', state_id)
+        return jsonify([city.to_json() for city in state.cities])
     except:
         abort(404)
-    cities = [city.to_json() for city in state.cities]
-    return jsonify(cities)
 
 
 @app_views.route('/cities/<city_id>', methods=['GET'])
 def get_city(city_id):
     """Return a City object given it's ID."""
     try:
-        city = storage.get("City", city_id)
+        city = storage.get("City", city_id).to_json()
     except:
         abort(404)
-    return jsonify(city.to_json())
+    return jsonify(city)
 
 
 @app_views.route('/cities/<city_id>', methods=['DELETE'])
@@ -50,6 +49,7 @@ def add_city(state_id):
     if 'name' not in r.keys():
         abort(400, {"Missing name"})
     city = City(name=r['name'])
+    city.state_id = state_id
     city.save()
     return jsonify(city.to_json()), 201
 
@@ -57,15 +57,16 @@ def add_city(state_id):
 @app_views.route('/cities/<city_id>', methods=['PUT'])
 def update_city(city_id):
     """Update a City object."""
-    try:
-        city = storage.get("City", city_id)
-    except:
+    city = storage.get("City", city_id)
+    if city is None:
         abort(404)
-    if request.is_json is False:
-        abort(400, {"Not a JSON"})
 
-    city = city.to_json()
+    try:
+        r = request.get_json().items()
+    except:
+        return jsonify(error='Not a JSON'), 400
+
     keys = ['id', 'state_id', 'created_at', 'updated_at']
-    city.update({k: v for (k, v) in r.items() if k not in keys})
+    {setattr(city, k, v) for k, v in r if k not in keys}
     city.save()
-    return jsonify(city), 200
+    return jsonify(city.to_json()), 200
