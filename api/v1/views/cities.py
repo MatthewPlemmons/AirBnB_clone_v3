@@ -45,14 +45,12 @@ def add_city(state_id):
     r = request.get_json()
     if r is None:
         return jsonify(error='Not a JSON'), 400
-
     try:
-        city = City(name=r['name']
+        city = City(name=r['name'])
         city.state_id = state_id
         city.save()
     except:
         return jsonify(error='Missing name'), 400
-
     return jsonify(city.to_json()), 201
 
 
@@ -63,7 +61,6 @@ def update_city(city_id):
         r = request.get_json().items()
     except:
         return jsonify(error='Not a JSON'), 400
-
     try:
         city = storage.get('City', city_id)
         keys = ['id', 'state_id', 'created_at', 'updated_at']
@@ -71,5 +68,4 @@ def update_city(city_id):
         city.save()
     except:
         abort(404)
-
     return jsonify(city.to_json()), 200
