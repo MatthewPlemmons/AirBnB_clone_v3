@@ -1,11 +1,11 @@
 #!/usr/bin/python3
-"""API functionality for City objects."""
+"""API functionality for Amenity objects."""
 from api.v1.views import app_views, storage
 from flask import abort, request, jsonify
 from models.amenity import Amenity
 
 
-@app_views.route('/amenities/', strict_slashes=False, methods=['GET'])
+@app_views.route('/amenities', strict_slashes=False, methods=['GET'])
 def all_amenities():
     """
     Return a JSON list of all Amenity objects.
@@ -50,7 +50,6 @@ def add_amenity():
         return jsonify(error="Missing name"), 400
     except:
         return jsonify(error="Not a JSON"), 400
-
     return jsonify(amenity.to_json()), 201
 
 
@@ -58,15 +57,14 @@ def add_amenity():
 def update_amenity(amenity_id):
     """Update an Amenity object."""
     try:
-        amenity = storage.get("Amenity", amenity_id).to_json()
-    except:
-        abort(404)
-
-    try:
         r = request.get_json().items()
     except:
         return jsonify(error="Not a JSON"), 400
-
-    amenity.update({k: v for (k, v) in r if k not in
-                    ['id', 'created_at', 'updated_at']})
-    return jsonify(amenity), 200
+    try:
+        amenity = storage.get('Amenity', amenity_id)
+        {setattr(amenity, k, v) for k, v in r if k not in
+         ['id', 'created_at', 'updated_at']}
+        amenity.save()
+    except:
+        abort(404)
+    return jsonify(amenity.to_json()), 200
