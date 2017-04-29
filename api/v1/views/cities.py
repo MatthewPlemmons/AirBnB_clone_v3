@@ -12,7 +12,7 @@ def all_cities(state_id):
     """
     try:
         state = storage.get('State', state_id)
-        return jsonify([city.to_json() for city in state.cities])
+        return jsonify([city.to_json() for city in state.cities]), 200
     except:
         abort(404)
 
@@ -24,7 +24,7 @@ def get_city(city_id):
         city = storage.get("City", city_id).to_json()
     except:
         abort(404)
-    return jsonify(city)
+    return jsonify(city), 200
 
 
 @app_views.route('/cities/<city_id>', methods=['DELETE'])
