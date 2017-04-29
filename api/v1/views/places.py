@@ -7,7 +7,7 @@ from models.place import Place
 
 @app_views.route('/cities/<city_id>/places', strict_slashes=False,
                  methods=['GET'])
-def all_places():
+def all_places(city_id):
     """Return a JSON list of all Place objects in a given City."""
     try:
         city = storage.get('City', city_id)
