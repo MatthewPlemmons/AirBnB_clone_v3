@@ -2,7 +2,7 @@
 """API functionality for Place objects."""
 from api.v1.views import app_views, storage
 from flask import abort, request, jsonify
-from models.places import Place
+from models.place import Place
 
 
 @app_views.route('/cities/<city_id>/places', strict_slashes=False,
