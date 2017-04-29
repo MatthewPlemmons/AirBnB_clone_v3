@@ -7,7 +7,7 @@ from models.state import State
 from models import storage
 
 
-@app_views.route('/states/', methods=['GET'])
+@app_views.route('/states', strict_slashes=False, methods=['GET'])
 def all_states():
     """Return a JSON list of all State objects"""
     state_list = []
@@ -20,7 +20,6 @@ def all_states():
 @app_views.route('/states/<state_id>', methods=['GET', 'DELETE'])
 def state_by_id(state_id):
     """Return or delete a State object depending on HTTP method"""
-    #import pdb; pdb.set_trace()
     s = storage.get("State", state_id)
     if s is None:
         abort(404)
@@ -41,11 +40,9 @@ def new_state():
         abort(400, {"error": "Not a JSON"})
     if 'name' not in r.keys():
         abort(400, {"error": "Missing name"})
-    s = State(name=r['name'])
-    storage.new(s)
-    s = storage.get("State", s.id)
-    s.save()
-    return jsonify(s.to_json()), 201
+    state = State(name=r['name'])
+    state.save()
+    return jsonify(state.to_json()), 201
 
 
 @app_views.route('/states/<state_id>', methods=['PUT'])
