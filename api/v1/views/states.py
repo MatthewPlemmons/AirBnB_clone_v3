@@ -20,16 +20,15 @@ def all_states():
 @app_views.route('/states/<state_id>', methods=['GET', 'DELETE'])
 def state_by_id(state_id):
     """Return or delete a State object depending on HTTP method"""
-    s = storage.get("State", state_id)
+    s = storage.get('State', state_id)
     if s is None:
         abort(404)
-    if request.method == "GET":
-        return jsonify(s.to_json())
-    else:
+    if request.method == 'GET':
+        return jsonify(s.to_json()), 200
+    if request.method == 'DELETE':
         storage.delete(s)
         storage.save()
         return jsonify({}), 200
-    abort(404)
 
 
 @app_views.route('/states/', methods=['POST'])
