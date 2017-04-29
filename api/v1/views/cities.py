@@ -45,6 +45,8 @@ def add_city(state_id):
     r = request.get_json()
     if r is None:
         return jsonify(error='Not a JSON'), 400
+    if storage.get('State', state_id) is None:
+        abort(404)
     try:
         city = City(name=r['name'])
         city.state_id = state_id
