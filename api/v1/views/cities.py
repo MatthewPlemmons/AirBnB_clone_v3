@@ -30,12 +30,11 @@ def get_city(city_id):
 @app_views.route('/cities/<city_id>', methods=['DELETE'])
 def delete_city(city_id):
     """Delete a City object by it's ID."""
-    try:
-        city = storage.get("City", city_id)
-        storage.delete(city)
-        storage.save()
-    except:
+    city = storage.get('City', city_id)
+    if city is None:
         abort(404)
+    storage.delete(city)
+    storage.save()
     return jsonify({}), 200
 
 
