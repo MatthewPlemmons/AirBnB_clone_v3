@@ -39,16 +39,15 @@ def delete_user(user_id):
 @app_views.route('/users', strict_slashes=False, methods=['POST'])
 def add_user():
     """Add a new User object."""
-    try:
-        r = request.get_json()
-        if 'email' not in r:
-            return jsonify(error='Missing email'), 400
-        if 'password' not in r:
-            return jsonify(error='Missing password'), 400
-        user = User(**r)
-        user.save()
-    except:
+    r = request.get_json()
+    if r is None:
         return jsonify(error='Not a JSON'), 400
+    if 'email' not in r:
+        return jsonify(error='Missing email'), 400
+    if 'password' not in r:
+        return jsonify(error='Missing password'), 400
+    user = User(**r)
+    user.save()
     return jsonify(user.to_json()), 201
 
 
