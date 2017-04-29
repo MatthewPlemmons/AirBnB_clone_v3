@@ -7,9 +7,7 @@ from models.user import User
 
 @app_views.route('/users', strict_slashes=False, methods=['GET'])
 def all_users():
-    """
-    Return a JSON list of all User objects.
-    """
+    """Return a JSON list of all User objects."""
     try:
         users = storage.all('User').values()
     except:
@@ -47,15 +45,10 @@ def add_user():
             return jsonify(error='Missing email'), 400
         if 'password' not in r:
             return jsonify(error='Missing password'), 400
-        user = User(first_name=r['name'],
-                    last_name=r['last'],
-                    email=r['email'],
-                    password=r['password'])
+        user = User(**r)
         user.save()
-    except KeyError:
-        return jsonify(error="Missing name"), 400
     except:
-        return jsonify(error="Not a JSON"), 400
+        return jsonify(error='Not a JSON'), 400
     return jsonify(user.to_json()), 201
 
 
@@ -65,7 +58,7 @@ def update_user(user_id):
     try:
         r = request.get_json().items()
     except:
-        return jsonify(error="Not a JSON"), 400
+        return jsonify(error='Not a JSON'), 400
     try:
         user = storage.get('User', user_id)
         {setattr(user, k, v) for k, v in r if k not in
