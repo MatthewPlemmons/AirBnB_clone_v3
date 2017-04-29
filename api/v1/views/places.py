@@ -51,6 +51,7 @@ def add_place(city_id):
     if 'name' not in r:
         return jsonify(error='Missing name'), 400
     place = Place(**r)
+    place.city_id = city_id
     place.save()
     return jsonify(place.to_json()), 201
 
