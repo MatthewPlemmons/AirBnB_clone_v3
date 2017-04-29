@@ -41,17 +41,17 @@ def delete_city(city_id):
 @app_views.route('/states/<state_id>/cities', methods=['POST'])
 def add_city(state_id):
     """Add a new City object to a State."""
-    r = request.get_json()
-    if r is None:
-        return jsonify(error='Not a JSON'), 400
     if storage.get('State', state_id) is None:
         abort(404)
     try:
+        r = request.get_json()
         city = City(name=r['name'])
         city.state_id = state_id
         city.save()
-    except:
+    except KeyError:
         return jsonify(error='Missing name'), 400
+    except:
+        return jsonify(error='Not a JSON'), 400
     return jsonify(city.to_json()), 201
 
 
