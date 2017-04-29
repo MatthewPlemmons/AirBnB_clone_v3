@@ -5,7 +5,8 @@ from flask import abort, request, jsonify
 from models.city import City
 
 
-@app_views.route('/states/<state_id>/cities', methods=['GET'])
+@app_views.route('/states/<state_id>/cities', strict_slashes=False,
+                 methods=['GET'])
 def all_cities(state_id):
     """
     Return a JSON list of all City objects for a given State.
@@ -38,7 +39,8 @@ def delete_city(city_id):
     return jsonify({}), 200
 
 
-@app_views.route('/states/<state_id>/cities', methods=['POST'])
+@app_views.route('/states/<state_id>/cities', strict_slashes=False,
+                 methods=['POST'])
 def add_city(state_id):
     """Add a new City object to a State."""
     if storage.get('State', state_id) is None:
