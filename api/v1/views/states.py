@@ -31,7 +31,7 @@ def state_by_id(state_id):
         return jsonify({}), 200
 
 
-@app_views.route('/states/', methods=['POST'])
+@app_views.route('/states/', strict_slashes=False, methods=['POST'])
 def new_state():
     """Create a new State object"""
     r = request.get_json()
