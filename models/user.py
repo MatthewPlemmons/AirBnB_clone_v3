@@ -2,6 +2,7 @@
 from models.base_model import BaseModel, Base, Table, Column, String
 from sqlalchemy.orm import relationship, backref
 from os import getenv
+import hashlib
 """
 user module
     contains
@@ -34,3 +35,10 @@ class User(BaseModel, Base):
         initializes from BaseModel
         """
         super().__init__(*args, **kwargs)
+
+    def _credential_hash(self):
+        """Md5 hash for password encryption."""
+        m = hashlib.md5()
+        m.update(self.password.encode(encoding='utf_8'))
+        self.password = m.hexdigest()
+        return

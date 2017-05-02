@@ -47,6 +47,7 @@ def add_user():
     if 'password' not in r:
         return jsonify(error='Missing password'), 400
     user = User(**r)
+    user._credential_hash()
     user.save()
     return jsonify(user.to_json()), 201
 
@@ -62,7 +63,8 @@ def update_user(user_id):
         user = storage.get('User', user_id)
         {setattr(user, k, v) for k, v in r if k not in
          ['id', 'email', 'created_at', 'updated_at']}
-        user.save()
     except:
         abort(404)
+    user._credential_hash()
+    user.save()
     return jsonify(user.to_json()), 200

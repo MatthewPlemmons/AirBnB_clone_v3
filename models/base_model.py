@@ -10,7 +10,9 @@ import uuid
 This module contains the BaseModel class:
 All classes should inherit from this class
 """
-if getenv('HBNB_TYPE_STORAGE', 'fs') == 'db':
+
+type_storage = getenv('HBNB_TYPE_STORAGE', 'fs')
+if type_storage == 'db':
     Base = declarative_base()
 else:
     Base = object
@@ -18,7 +20,7 @@ else:
 
 class BaseModel:
     """The base class for all storage objects in this project"""
-    if getenv('HBNB_TYPE_STORAGE', 'fs') == 'db':
+    if type_storage == 'db':
         id = Column(String(60), primary_key=True, nullable=False)
         created_at = Column(DateTime(timezone=True), default=datetime.now(),
                             nullable=False)
@@ -84,27 +86,19 @@ class BaseModel:
 
     def to_json(self):
         """convert to json"""
-        dupe = self.__dict__.copy()
-        dupe.pop('_sa_instance_state', None)
-        dupe["created_at"] = dupe["created_at"].isoformat()
+        d = self.__dict__.copy()
+        d["created_at"] = d["created_at"].isoformat()
 
         # sqlAlchemy_storage_engine
-        if ("updated_at" in dupe):
-            dupe["updated_at"] = dupe["updated_at"].isoformat()
+        if 'updated_at' in d:
+            d['updated_at'] = d['updated_at'].isoformat()
 
-        dupe["__class__"] = type(self).__name__
-        return dupe
+        if '_sa_instance_state' in d:
+            del d['_sa_instance_state']
 
+        if type_storage == 'db':
+            if 'password' in d:
+                del d['password']
 
-##    def __setattr__(self, name, value):
-##        """
-##        Forbids update of instance variables
-##        Arguments:
-##        name: name
-##        value: value
-##        """
-##        if name in ("id", "created_at", "updated_at"):
-##            if name in self.__dict__.keys()
-## and self.__dict__[name] is not None:
-##                return
-##        self.__dict__[name] = value
+        d["__class__"] = type(self).__name__
+        return d
