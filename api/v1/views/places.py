@@ -16,7 +16,8 @@ def all_places(city_id):
         abort(404)
 
 
-@app_views.route('/places/<place_id>', methods=['GET'])
+@app_views.route('/places/<place_id>', strict_slashes=False,
+                 methods=['GET'])
 def get_place(place_id):
     """Return a Place object given it's ID."""
     try:
@@ -26,15 +27,16 @@ def get_place(place_id):
         abort(404)
 
 
-@app_views.route('/places/<place_id>', methods=['DELETE'])
+@app_views.route('/places/<place_id>', strict_slashes=False,
+                 methods=['DELETE'])
 def delete_place(place_id):
     """Delete a Place object by it's ID."""
-    place = storage.get("Place", place_id)
-    if place is None:
+    try:
+        storage.delete(storage.get('Place', place_id))
+        storage.save()
+        return jsonify({}), 200
+    except:
         abort(404)
-    storage.delete(place)
-    storage.save()
-    return jsonify({}), 200
 
 
 @app_views.route('/cities/<city_id>/places', strict_slashes=False,
@@ -56,7 +58,8 @@ def add_place(city_id):
     return jsonify(place.to_json()), 201
 
 
-@app_views.route('/places/<place_id>', methods=['PUT'])
+@app_views.route('/places/<place_id>', strict_slashes=False,
+                 methods=['PUT'])
 def update_place(place_id):
     """Update a Place object."""
     try:
