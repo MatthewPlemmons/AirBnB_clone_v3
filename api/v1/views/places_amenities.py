@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 """API functionality for Amenity objects."""
-from api.v1.views import app_views, storage
+from api.v1.views import app_views, Place, storage
 from flask import abort, request, jsonify
-from models.amenity import Amenity
-from models.place import Place
 from os import getenv
 
-
-#if getenv('HBNB_TYPE_STORAGE', 'fs') == 'db':
 
 @app_views.route('/places/<place_id>/amenities', strict_slashes=False,
                  methods=['GET'])
@@ -44,8 +40,7 @@ def link_amenity_to(place_id, amenity_id):
     if place is None or amenity is None:
         abort(404)
     if amenity in place.amenities:
-        a = {a.to_json() for a in place.amenities if a == amenity}
-        return jsonify(a), 200
+        return jsonify(amenity.to_json()), 200
     try:
         place.amenities.append(amenity)
         place.save()
