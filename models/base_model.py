@@ -85,7 +85,7 @@ class BaseModel:
     def to_json(self):
         """convert to json"""
         dupe = self.__dict__.copy()
-        del dupe['_sa_instance_state']
+        dupe.pop('_sa_instance_state', None)
         dupe["created_at"] = dupe["created_at"].isoformat()
 
         # sqlAlchemy_storage_engine
