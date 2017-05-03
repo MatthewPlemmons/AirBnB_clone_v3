@@ -2,6 +2,7 @@
 """API for the AirBnB clone application"""
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flasgger import Swagger
 from models import storage
 from os import getenv
 from api.v1.views import app_views
@@ -9,6 +10,7 @@ from api.v1.views import app_views
 
 app = Flask(__name__)
 CORS(app, origins="0.0.0.0")
+Swagger(app)
 app.register_blueprint(app_views)
 
 
