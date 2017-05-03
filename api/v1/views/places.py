@@ -84,9 +84,7 @@ def places_search():
     places = []
     r = request.get_json()
 
-    # Find place object that contains amenties
     if 'amenities' in r:
-
         a = [storage.get('Amenity', amenity) for amenity in r['amenities']]
         for i in a:
             p = i.place_amenities
