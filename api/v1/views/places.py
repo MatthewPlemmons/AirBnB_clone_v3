@@ -3,6 +3,7 @@
 from api.v1.views import app_views, storage
 from flask import abort, request, jsonify
 from models.place import Place
+import itertools
 
 
 @app_views.route('/cities/<city_id>/places', strict_slashes=False,
@@ -74,3 +75,47 @@ def update_place(place_id):
     except:
         abort(404)
     return jsonify(place.to_json()), 200
+
+
+@app_views.route('/places_search', strict_slashes=False,
+                 methods=['POST'])
+def places_search():
+    """Search for all Places linked to given objects."""
+    places = []
+    r = request.get_json()
+
+    # Find place object that contains amenties
+    if 'amenities' in r:
+
+        a = [storage.get('Amenity', amenity) for amenity in r['amenities']]
+        for i in a:
+            p = i.place_amenities
+            place_id = p[0].place_id
+            place = storage.get('Place', place_id)
+            n = 0
+            for a in place.amenities:
+                if a.id not in r['amenities']:
+                    break
+                ++n
+                if n == len(r['amenities']):
+                    places.append(place)
+
+    # Gather place objects from states
+    if 'states' in r:
+        state_ids = r['states']
+        states = [storage.get('State', state) for state in state_ids]
+        cities = [state.cities for state in states]
+        cities = list(itertools.chain.from_iterable(cities))
+        for city in cities:
+            if city.places:
+                places.append(city.places)
+
+    # Gather place objects from cities
+    if 'cities' in r:
+        for city in r['cities']:
+            c = storage.get('City', city)
+            if c not in cities:
+                places.append(c.places)
+
+    del places[0][0].amenities
+    return jsonify([places[0][0].to_json()])
